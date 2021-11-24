@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shop_app/providers/cart.dart';
-import 'package:shop_app/providers/product.dart';
-import 'package:shop_app/providers/products.dart';
+import 'package:shop_app/screens/cart_screen.dart';
+import 'package:shop_app/widgets/app_drawer.dart';
 import 'package:shop_app/widgets/badge.dart';
 import 'package:shop_app/widgets/products_grid.dart';
 
 enum FilterOptions {
-  Favorites,
-  All,
+  favorites,
+  all,
 }
 
 class ProductsOverviewScreen extends StatefulWidget {
@@ -23,7 +23,6 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final productsContainer = Provider.of<Products>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         title: const Text('MyShop'),
@@ -31,7 +30,7 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
           PopupMenuButton(
             onSelected: (FilterOptions selectedValue) {
               setState(() {
-                if (selectedValue == FilterOptions.Favorites) {
+                if (selectedValue == FilterOptions.favorites) {
                   _showOnlyFavorites = true;
                 } else {
                   _showOnlyFavorites = false;
@@ -42,29 +41,31 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
             itemBuilder: (_) => [
               const PopupMenuItem(
                 child: Text('Only Favorites'),
-                value: FilterOptions.Favorites,
+                value: FilterOptions.favorites,
               ),
               const PopupMenuItem(
                 child: Text('Show All'),
-                value: FilterOptions.All,
+                value: FilterOptions.all,
               ),
             ],
           ),
-          Consumer<Cart>(builder: (_, cart, __) =>
-            Badge(
+          Consumer<Cart>(
+            builder: (_, cart, __) => Badge(
               value: cart.itemCount.toString(),
               color: Colors.pink,
               child: IconButton(
                 icon: const Icon(
                   Icons.shopping_cart,
-                ), onPressed: () {
-                  cart.addItem(productsContainer.items, price, title);
-              },
+                ),
+                onPressed: () {
+                  Navigator.of(context).pushNamed(CartScreen.routeName);
+                },
               ),
             ),
           ),
         ],
       ),
+      drawer: const AppDrawer(),
       body: ProductsGrid(_showOnlyFavorites),
     );
   }
