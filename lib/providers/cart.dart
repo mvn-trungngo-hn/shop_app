@@ -6,10 +6,11 @@ class CartItem {
   final int quantity;
   final double price;
 
-  CartItem({required this.id,
-    required this.title,
-    required this.quantity,
-    required this.price});
+  CartItem(
+      {required this.id,
+      required this.title,
+      required this.quantity,
+      required this.price});
 }
 
 class Cart with ChangeNotifier {
@@ -35,21 +36,19 @@ class Cart with ChangeNotifier {
     if (_items.containsKey(productId)) {
       _items.update(
           productId,
-              (value) =>
-              CartItem(
-                  id: value.id,
-                  title: value.title,
-                  quantity: value.quantity + 1,
-                  price: value.price));
+          (value) => CartItem(
+              id: value.id,
+              title: value.title,
+              quantity: value.quantity + 1,
+              price: value.price));
     } else {
       _items.putIfAbsent(
           productId,
-              () =>
-              CartItem(
-                  id: DateTime.now().toString(),
-                  title: title,
-                  quantity: 1,
-                  price: price));
+          () => CartItem(
+              id: DateTime.now().toString(),
+              title: title,
+              quantity: 1,
+              price: price));
     }
     notifyListeners();
   }
@@ -61,6 +60,24 @@ class Cart with ChangeNotifier {
 
   void clear() {
     _items = {};
+    notifyListeners();
+  }
+
+  void removeSingleItem(String productId) {
+    if (!_items.containsKey(productId)) {
+      return;
+    }
+    if (_items[productId]!.quantity > 1) {
+      _items.update(
+          productId,
+          (value) => CartItem(
+              id: value.id,
+              title: value.title,
+              quantity: value.quantity - 1,
+              price: value.price));
+    } else {
+      _items.remove(productId);
+    }
     notifyListeners();
   }
 }
